@@ -1,0 +1,101 @@
+<odoo>
+    <data>
+        <record id="view_custom_deposit_form" model="ir.ui.view">
+            <field name="name">view.custom.deposit.form</field>
+            <field name="model">custom.deposit</field>
+            <field name="arch" type="xml">
+                <form string="Deposito">
+                    <header>
+                        <field name="estado" 
+                               widget="statusbar"
+                               statusbar_visible="S,C,F"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" style="padding: 5px 0">
+                            <h2 class="o_row">
+                                Papeleta de Deposito: 
+                                <span attrs="{ 'invisible': [('estado','not in',[ 'S','C','F' ])] }">
+                                    <field name="papeleta_deposito" 
+                                           attrs="{ 'readonly': True }"/>
+                                </span>
+                            </h2>
+                        </div>
+                        <group name="group_top">
+                            <group name="group_left">
+                                <field name="papeleta_deposito" />
+                                <field name="cliente" />
+                                <label for="valor"/>
+                                <div class="o_row">
+                                    <field name="valor" />
+                                    <field name="moneda" options="{'no_create': True, 'no_open': True }" />
+                                </div>
+                                <field name="fecha" />
+                            </group>
+                            <group name="group_right">
+                                <field name="proforma" />
+                                <field name="cuenta_bancaria" />
+                                <field name="documento"
+                                       widget="image"
+                                       options="{ 'size': [100, 100] }" />
+                                <field name="nota" />
+                                <field name="vendedor"
+                                       attrs="{ 'invisible': [('estado', '!=', 'S')] }"
+                                       options="{'no_create': True, 'no_open': True }" 
+                                       />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_custom_deposit_tree" model="ir.ui.view">
+            <field name="name">view.custom.deposit.tree</field>
+            <field name="model">custom.deposit</field>
+            <field name="arch" type="xml">
+                <tree string="Depositos">
+                    <field name="fecha" />
+                    <field name="cliente" />
+                    <field name="papeleta_deposito" />
+                    <field name="cuenta_bancaria" />
+                    <field name="valor" />
+                    <field name="estado" />                    
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_custom_deposit_view" model="ir.actions.act_window">
+            <field name="name">Deposito</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">custom.deposit</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_content_create">
+                    Depositos
+                </p>
+                <p>
+                    Click "Nuevo" para añadir nuevos elementos.
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_custom_deposit_root"
+            web_icon="custom_deposit,static/description/elearning.png"
+            name="Depositos"
+            sequence="10"/>
+
+        <menuitem
+            id="menu_custom_deposit_cliente"
+            name="Cliente"
+            parent="menu_custom_deposit_root"
+            sequence="0"/>
+
+        <menuitem
+            id="menu_custom_deposit_deposito"
+            name="Depositos"
+            parent="menu_custom_deposit_cliente"
+            sequence="0"
+            action="action_custom_deposit_view"/>
+    </data>
+</odoo>
