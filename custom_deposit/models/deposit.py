@@ -50,7 +50,7 @@ class Deposit(models.Model):
     cuenta_bancaria = fields.Many2one(
         string = 'Cuenta bancaria',
         comodel_name = 'res.partner.bank',
-        default = lambda self : self.env['res.partner.bank'].search([('partner_id','=',self.env.company)])
+        default = lambda self : self.env['res.partner.bank'].search([('partner_id','=',self.env.company.id)])
     )
 
     estado = fields.Selection(
