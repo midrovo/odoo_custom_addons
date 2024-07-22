@@ -150,3 +150,5 @@ class Deposit(models.Model):
                     import_result['ids'].append(new_record.id)
             
         return import_result
+    
+    # def calcular_deposito():

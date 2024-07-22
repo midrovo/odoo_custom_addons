@@ -13,7 +13,7 @@
                     <sheet>
                         <div class="oe_title" style="padding: 5px 0">
                             <h2 class="o_row">
-                                Papeleta de Deposito: 
+                                Orden de Deposito:  
                                 <span attrs="{ 'invisible': [('estado','not in',[ 'S','C','F' ])] }">
                                     <field name="papeleta_deposito" 
                                            attrs="{ 'readonly': True }"/>
