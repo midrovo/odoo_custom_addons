@@ -151,4 +151,5 @@ class Deposit(models.Model):
             
         return import_result
     
-    # def calcular_deposito():
+    def calcular_deposito(valor_total, valor_cancelado):
+        return valor_total - valor_cancelado
