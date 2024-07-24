@@ -49,9 +49,12 @@ class Deposit(models.Model):
 
     cuenta_bancaria = fields.Many2one(
         string = 'Cuenta bancaria de la empresa',
-        comodel_name = 'res.partner.bank',
-        default = lambda self : self.env['res.partner.bank'].search([('partner_id','=',self.env.company.id)]),
-        readonly= True
+        comodel_name = 'account.journal',
+        domain=[('type','=','bank')]
+    )
+
+    numero_de_cuenta = fields.Char(
+        string='Número de cuenta'
     )
 
     estado = fields.Selection(
@@ -67,16 +70,19 @@ class Deposit(models.Model):
     )
     
     ### metodos ###
+
+    
+    @api.onchange('cuenta_bancaria')
+    def _onchange_cuenta_bancaria(self):
+        if self.cuenta_bancaria in self:
+            cuenta_partner = self.env['res.partner.bank'].search([('id','=',self.cuenta_bancaria.bank_account_id.id)], 
+            limit=1
+            )
+
+            self.numero_de_cuenta = cuenta_partner.acc_number
+    
     @api.model
-    def create(self, vals):
-        record = self.search([
-            ('cuenta_bancaria', '=', vals['cuenta_bancaria']),
-        ], limit = 1)
-        
-        if record:
-            if record.cliente.id != vals['cliente'] and record.cuenta_bancaria.id == vals['cuenta_bancaria']:
-                raise ValidationError('La cuenta bancaria pertenece a otro cliente')
-            
+    def create(self, vals):            
         vals['estado'] = 'S'
             
         return super(Deposit, self).create(vals)
@@ -99,57 +105,16 @@ class Deposit(models.Model):
             'nextrow': len(data),
         }
         
-        for record in records:
-            cuenta_bancaria = self.env['res.partner.bank'].search([
-                ('acc_number', '=', record['cuenta_bancaria'].split('-')[0])
-            ])
-            
+        for record in records:            
             deposit_db = self.search([
-                ('cuenta_bancaria', '=', cuenta_bancaria.id),
-                ('papeleta_deposito', '=', record['papeleta_deposito'])
+                ('numero_de_cuenta', '=', record['numero_de_cuenta']),
+                ('papeleta_deposito', '=', record['papeleta_deposito']),
+                ('valor', '=', record['valor'])
             ])
             
             if deposit_db:
-                if deposit_db.estado == 'S' and deposit_db.estado != 'F':
-                    deposit_db.write({ 'estado': 'C' })
-                    
-                    import_result['ids'].append(deposit_db.id)
-            
-            else:
-                partner_id = self.env['res.partner'].search([('name','=',record['cliente'])])
-                
-                if not partner_id:
-                    cliente = {
-                        'name': record['cliente'] 
-                    }
-                    
-                    new_partner_id = self.env['res.partner'].create(cliente)
-                    
-                    cuenta = {
-                        'acc_number': record['cuenta_bancaria'].split('-')[0],
-                        'partner_id': new_partner_id.id,
-                        'bank_id': False
-                    }
-                    
-                    new_cuenta_bancaria = self.env['res.partner.bank'].create(cuenta)
-                
-                    new_deposit = {
-                        'papeleta_deposito': record['papeleta_deposito'],
-                        'cliente': new_partner_id.id,
-                        'valor': record['valor'],
-                        'fecha': record['fecha'],
-                        'cuenta_bancaria': new_cuenta_bancaria.id,
-                    }
-                    
-                    new_record = self.create(new_deposit)
-                    
-                    new_record.write({ 'estado': 'C' })
-                    
-                    _logger.info(f'ESTADO >>> { new_record.estado }')
-                    
-                    import_result['ids'].append(new_record.id)
+                deposit_db.write({ 'estado': 'C' })
+                import_result['ids'].append(deposit_db.id)
             
         return import_result
     
-    def calcular_deposito(valor_total, valor_cancelado):
-        return valor_total - valor_cancelado
