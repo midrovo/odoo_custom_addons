@@ -34,6 +34,7 @@
                             <group name="group_right">
                                 <field name="proforma" />
                                 <field name="cuenta_bancaria" />
+                                <field name="numero_de_cuenta" />
                                 <field name="documento"
                                        widget="image"
                                        options="{ 'size': [100, 100] }" />
@@ -57,7 +58,7 @@
                     <field name="fecha" />
                     <field name="cliente" />
                     <field name="papeleta_deposito" />
-                    <field name="cuenta_bancaria" />
+                    <field name="numero_de_cuenta" />
                     <field name="valor" />
                     <field name="estado" />                    
                 </tree>

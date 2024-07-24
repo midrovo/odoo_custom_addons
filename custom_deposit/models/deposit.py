@@ -72,14 +72,14 @@ class Deposit(models.Model):
     ### metodos ###
 
     
-    @api.onchange('cuenta_bancaria')
-    def _onchange_cuenta_bancaria(self):
-        if self.cuenta_bancaria in self:
-            cuenta_partner = self.env['res.partner.bank'].search([('id','=',self.cuenta_bancaria.bank_account_id.id)], 
-            limit=1
-            )
+    # @api.onchange('cuenta_bancaria')
+    # def _onchange_cuenta_bancaria(self):
+    #     if self.cuenta_bancaria in self:
+    #         cuenta_partner = self.env['res.partner.bank'].search([('id','=',self.cuenta_bancaria.bank_account_id.id)], 
+    #         limit=1
+    #         )
 
-            self.numero_de_cuenta = cuenta_partner.acc_number
+    #         self.numero_de_cuenta = cuenta_partner.acc_number
     
     @api.model
     def create(self, vals):            
@@ -117,4 +117,3 @@ class Deposit(models.Model):
                 import_result['ids'].append(deposit_db.id)
             
         return import_result
-    
