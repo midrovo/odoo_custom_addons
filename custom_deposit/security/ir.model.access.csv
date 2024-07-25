@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_custom_deposit,custom_deposit,model_custom_deposit,base.group_user,1,1,1,1
+custom_deposit_access_user_high,high access to custom deposit,model_custom_deposit,custom_deposit.group_custom_deposit_manager,1,1,1,1
+custom_deposit_access_user_medium,medium access to custom deposit,model_custom_deposit,custom_deposit.group_custom_deposit_user,1,1,1,0
+custom_deposit_access_user_base,base access to custom deposit,model_custom_deposit,base.group_user,1,1,1,1

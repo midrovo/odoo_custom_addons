@@ -13,7 +13,7 @@
                     <sheet>
                         <div class="oe_title" style="padding: 5px 0">
                             <h2 class="o_row">
-                                Orden de Deposito:  
+                                Papeleta de Deposito: 
                                 <span attrs="{ 'invisible': [('estado','not in',[ 'S','C','F' ])] }">
                                     <field name="papeleta_deposito" 
                                            attrs="{ 'readonly': True }"/>
@@ -33,16 +33,17 @@
                             </group>
                             <group name="group_right">
                                 <field name="proforma" />
-                                <field name="cuenta_bancaria" />
-                                <field name="numero_de_cuenta" />
+                                <field name="cuenta_bancaria" 
+                                       options="{'no_create': True, 'no_open': True }"
+                                       />
+                                <field name="numero_cuenta"/>
                                 <field name="documento"
                                        widget="image"
                                        options="{ 'size': [100, 100] }" />
                                 <field name="nota" />
                                 <field name="vendedor"
                                        attrs="{ 'invisible': [('estado', '!=', 'S')] }"
-                                       options="{'no_create': True, 'no_open': True }" 
-                                       />
+                                       options="{'no_create': True, 'no_open': True }" />
                             </group>
                         </group>
                     </sheet>
@@ -58,7 +59,7 @@
                     <field name="fecha" />
                     <field name="cliente" />
                     <field name="papeleta_deposito" />
-                    <field name="numero_de_cuenta" />
+                    <field name="numero_cuenta" />
                     <field name="valor" />
                     <field name="estado" />                    
                 </tree>
@@ -82,7 +83,7 @@
 
         <menuitem
             id="menu_custom_deposit_root"
-            web_icon="custom_deposit,static/description/elearning.png"
+            web_icon="custom_deposit,static/description/icon-deposito.jpg"
             name="Depositos"
             sequence="10"/>
 
@@ -97,6 +98,7 @@
             name="Depositos"
             parent="menu_custom_deposit_cliente"
             sequence="0"
-            action="action_custom_deposit_view"/>
+            action="action_custom_deposit_view"
+            groups="custom_deposit.group_custom_deposit_manager"/>
     </data>
 </odoo>
