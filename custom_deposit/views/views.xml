@@ -98,7 +98,6 @@
             name="Depositos"
             parent="menu_custom_deposit_cliente"
             sequence="0"
-            action="action_custom_deposit_view"
-            groups="custom_deposit.group_custom_deposit_manager"/>
+            action="action_custom_deposit_view"/>
     </data>
 </odoo>
