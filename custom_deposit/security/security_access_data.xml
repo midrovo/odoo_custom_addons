@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Modelo de acceso -->
-    <record id="access_custom_deposit_model_manager" model="ir.model.access">
+    <!-- <record id="access_custom_deposit_model_manager" model="ir.model.access">
         <field name="name">access.custom.deposit.model.manager</field>
         <field name="model_id" ref="model_custom_deposit"/>
         <field name="group_id" ref="group_custom_deposit_manager"/>
@@ -19,7 +19,7 @@
         <field name="perm_create" eval="True" />
         <field name="perm_write" eval="True" />
         <field name="perm_unlink" eval="False" />
-    </record>    
+    </record>     -->
 
     <!-- Crear categoria -->
     <record id="custom_deposit_category" model="ir.module.category">
