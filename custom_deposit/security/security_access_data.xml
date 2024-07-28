@@ -10,7 +10,6 @@
         <!-- Crear subcategoría -->
         <record id="custom_deposit_subcategory" model="ir.module.category">
             <field name="name">Permisos</field>
-            <field name="sequence">6</field>
             <field name="parent_id" ref="custom_deposit.custom_deposit_category" />
         </record>
 
@@ -19,13 +18,13 @@
             <field name="name">Operador de Depósitos</field>
             <field name="comment">Comment</field>
             <field name="category_id" ref="custom_deposit.custom_deposit_subcategory"/>
+            <field name="implied_ids" eval="[(4, ref('custom_deposit.group_custom_deposit_manager'))]"/>
         </record>
         
         <record id="group_custom_deposit_manager" model="res.groups">
             <field name="name">Administrador de Procesos de Depósitos</field>
             <field name="comment">Comment</field>
             <field name="category_id" ref="custom_deposit.custom_deposit_subcategory"/>
-            <!-- <field name="implied_ids" eval="[(4, ref('custom_deposit.group_custom_deposit_user'))]"/> -->
         </record>
         
         <!-- Crear reglas de acceso -->
