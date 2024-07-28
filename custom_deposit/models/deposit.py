@@ -88,25 +88,25 @@ class Deposit(models.Model):
             ('numero_cuenta', '=', vals['numero_cuenta'])
         ])
         
-        if 'fecha' in vals and vals['fecha']:
-            try:
-                date_obj = fields.Datetime.from_string(vals['fecha'])
-                formatted_fecha = date_obj.strftime('%Y-%m-%d %H:%M:%S')
+        # if 'fecha' in vals and vals['fecha']:
+        #     try:
+        #         date_obj = fields.Datetime.from_string(vals['fecha'])
+        #         formatted_fecha = date_obj.strftime('%Y-%m-%d %H:%M:%S')
 
-                date_history = formatted_fecha
+        #         date_history = formatted_fecha
 
-                date_history_dt = local_tz.localize(datetime.strptime(date_history, '%Y-%m-%d %H:%M:%S'))
+        #         date_history_dt = local_tz.localize(datetime.strptime(date_history, '%Y-%m-%d %H:%M:%S'))
 
-                date_utc = date_history_dt.astimezone(pytz.utc)
+        #         date_utc = date_history_dt.astimezone(pytz.utc)
 
-                history_date = date_utc.replace(tzinfo=None)
+        #         history_date = date_utc.replace(tzinfo=None)
                 
-                vals['fecha'] = history_date
-                # Convertir la fecha a un objeto datetime
-                _logger.info(f"date_history_dt: {date_history_dt}, date_utc: {date_utc}, history_date mod: {history_date}")
-            except (ParserError, TypeError, ValueError) as e:
-                _logger.warning(f"Error parsing date: {e}")
-                history_date = fields.Datetime.now()
+        #         vals['fecha'] = history_date
+        #         # Convertir la fecha a un objeto datetime
+        #         _logger.info(f"date_history_dt: {date_history_dt}, date_utc: {date_utc}, history_date mod: {history_date}")
+        #     except (ParserError, TypeError, ValueError) as e:
+        #         _logger.warning(f"Error parsing date: {e}")
+        #         history_date = fields.Datetime.now()
         
         if deposito_existente:
             numero_de_papeleta = vals['papeleta_deposito']
