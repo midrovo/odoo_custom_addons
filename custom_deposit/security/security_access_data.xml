@@ -4,24 +4,24 @@
     <data>
         <!-- Crear categoría -->
         <record id="custom_deposit_category" model="ir.module.category">
-            <field name="name">Perfiles de Acceso a Depósitos</field>
+            <field name="name">Depósitos</field>
         </record>
 
         <!-- Crear subcategoría -->
         <record id="custom_deposit_subcategory" model="ir.module.category">
-            <field name="name">Permisos</field>
+            <field name="name">Grupos de Acceso</field>
             <field name="parent_id" ref="custom_deposit.custom_deposit_category" />
         </record>
 
         <!-- Crear grupos -->
         <record id="group_custom_deposit_user" model="res.groups">
-            <field name="name">Operador de Depósitos</field>
+            <field name="name">Empleado</field>
             <field name="comment">Comment</field>
             <field name="category_id" ref="custom_deposit.custom_deposit_subcategory"/>
         </record>
         
         <record id="group_custom_deposit_manager" model="res.groups">
-            <field name="name">Administrador de Procesos de Depósitos</field>
+            <field name="name">Administrador</field>
             <field name="comment">Comment</field>
             <field name="category_id" ref="custom_deposit.custom_deposit_subcategory"/>
             <field name="implied_ids" eval="[(4, ref('custom_deposit.group_custom_deposit_user'))]"/>
