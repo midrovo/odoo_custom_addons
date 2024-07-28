@@ -64,7 +64,11 @@
                     <field name="papeleta_deposito" />
                     <field name="numero_cuenta" />
                     <field name="monto" />
-                    <field name="estado" />                    
+                    <field name="estado"
+                           widget="badge"
+                           decoration-info="estado == 'S'" 
+                           decoration-success="estado == 'C'" 
+                           decoration-primary="estado == 'F'" />                    
                 </tree>
             </field>
         </record>
