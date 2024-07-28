@@ -1,6 +1,11 @@
 from odoo import models, fields, api # type: ignore
 from odoo.exceptions import UserError # type: ignore
-from datetime import date
+from datetime import date, datetime
+import pytz
+from dateutil import parser
+from dateutil.parser import ParserError
+
+local_tz = pytz.timezone('America/Guayaquil')
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -19,8 +24,8 @@ class Deposit(models.Model):
         comodel_name = 'res.partner',
     )
 
-    valor = fields.Monetary(
-        string = 'Valor',
+    monto = fields.Monetary(
+        string = 'Monto',
         currency_field = "moneda",
     )
     
@@ -32,29 +37,29 @@ class Deposit(models.Model):
 
     fecha = fields.Date(
         string = 'Fecha',
-        default = date.today(),
+        default = datetime.today()
     )
 
     nota = fields.Char(
         string = 'Nota',
     )
 
-    documento = fields.Binary(
-        string = 'Documento',
+    doc_deposit = fields.Binary(
+        string = 'Documento de Deposito',
     )
 
     proforma = fields.Char(
-        string = 'Proforma',
+        string = 'No. de Proforma',
     )
     
     cuenta_bancaria = fields.Many2one(
         comodel_name = 'account.journal',
-        string = 'Cuenta bancaria de la empresa',
+        string = 'Cuenta Bancaria de la Empresa',
         domain="[('type','=','bank')]"        
     )
     
     numero_cuenta = fields.Char(
-        string = 'No. de cuenta',
+        string = 'No. de Cuenta',
     )
 
     estado = fields.Selection(
@@ -83,6 +88,26 @@ class Deposit(models.Model):
             ('numero_cuenta', '=', vals['numero_cuenta'])
         ])
         
+        if 'fecha' in vals and vals['fecha']:
+            try:
+                date_obj = fields.Datetime.from_string(vals['fecha'])
+                formatted_fecha = date_obj.strftime('%Y-%m-%d %H:%M:%S')
+
+                date_history = formatted_fecha
+
+                date_history_dt = local_tz.localize(datetime.strptime(date_history, '%Y-%m-%d %H:%M:%S'))
+
+                date_utc = date_history_dt.astimezone(pytz.utc)
+
+                history_date = date_utc.replace(tzinfo=None)
+                
+                vals['fecha'] = history_date
+                # Convertir la fecha a un objeto datetime
+                _logger.info(f"date_history_dt: {date_history_dt}, date_utc: {date_utc}, history_date mod: {history_date}")
+            except (ParserError, TypeError, ValueError) as e:
+                _logger.warning(f"Error parsing date: {e}")
+                history_date = fields.Datetime.now()
+        
         if deposito_existente:
             numero_de_papeleta = vals['papeleta_deposito']
             numero_de_cuenta = vals['numero_cuenta']
@@ -94,9 +119,6 @@ class Deposit(models.Model):
                 ('id', '=', partner_bank.bank_id.id)
             ])
             
-            _logger.info(f'RECUPERANDO BANCO >>> { bank }')
-            
-            _logger.info(f'RECUPERANDO PARTNER BANK >>> { partner_bank } - { bank.name }')
             raise UserError(
                 f'La papeleta de deposito con este numero: { numero_de_papeleta }  ya existe en { bank.name }.'
             )
@@ -113,25 +135,31 @@ class Deposit(models.Model):
         return result 
     
     @api.model
-    def load(self, fields, data):
-       records = [ dict(zip(fields, record)) for record in data ]
+    def load(self, fields, data):        
+        records = [ dict(zip(fields, record)) for record in data ]
        
-       import_result = {
-           'ids': [],
-           'messages': [],
-           'nextrow': len(data),
-       }
+        import_result = {
+            'ids': [],
+            'messages': [],
+            'nextrow': len(data),
+        }
+        
+        _logger.info('HOLA ENTRA EN EL LOAD')
        
-       for record in records:           
-           deposit_db = self.search([
-               ('numero_cuenta', '=', record['numero_cuenta']),
-               ('papeleta_deposito', '=', record['papeleta_deposito']),
-               ('fecha', '=', record['fecha']),
-               ('valor', '=', record['valor'])
-           ])
+        for record in records:
+            #record['fecha'] = datetime.strptime(record['fecha'], '%d/%m/%Y').strftime('%Y-%m-%d') 
+            
+            #fech = record['fecha']
+            #_logger.info(f'RECUPERANDO LA FECHA DEL RECORD { fech }')                       
+            deposit_db = self.search([
+                ('numero_cuenta', '=', record['numero_cuenta']),
+                ('papeleta_deposito', '=', record['papeleta_deposito']),
+                ('fecha', '=', record['fecha']),
+                ('monto', '=', record['monto'])
+            ])
+            
+            if deposit_db:
+                deposit_db.write({ 'estado': 'S' })
+                import_result['ids'].append(deposit_db.id)
            
-           if deposit_db:
-               deposit_db.write({ 'estado': 'C' })
-               import_result['ids'].append(deposit_db.id)
-           
-       return import_result
+        return import_result

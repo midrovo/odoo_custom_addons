@@ -22,11 +22,12 @@
                         </div>
                         <group name="group_top">
                             <group name="group_left">
-                                <field name="papeleta_deposito" />
+                                <field name="papeleta_deposito"
+                                       attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"/>
                                 <field name="cliente" />
-                                <label for="valor"/>
+                                <label for="monto"/>
                                 <div class="o_row">
-                                    <field name="valor" />
+                                    <field name="monto" />
                                     <field name="moneda" options="{'no_create': True, 'no_open': True }" />
                                 </div>
                                 <field name="fecha" />
@@ -35,9 +36,11 @@
                                 <field name="proforma" />
                                 <field name="cuenta_bancaria" 
                                        options="{'no_create': True, 'no_open': True }"
+                                       attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"
                                        />
-                                <field name="numero_cuenta"/>
-                                <field name="documento"
+                                <field name="numero_cuenta"
+                                       attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"/>
+                                <field name="doc_deposit"
                                        widget="image"
                                        options="{ 'size': [100, 100] }" />
                                 <field name="nota" />
@@ -60,7 +63,7 @@
                     <field name="cliente" />
                     <field name="papeleta_deposito" />
                     <field name="numero_cuenta" />
-                    <field name="valor" />
+                    <field name="monto" />
                     <field name="estado" />                    
                 </tree>
             </field>
