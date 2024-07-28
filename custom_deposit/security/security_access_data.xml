@@ -24,7 +24,7 @@
             <field name="name">Administrador de Procesos de Depósitos</field>
             <field name="comment">Comment</field>
             <field name="category_id" ref="custom_deposit.custom_deposit_subcategory"/>
-            <field name="implied_ids" eval="[(4, ref('custom_deposit.group_custom_deposit_user'))]"/>
+            <!-- <field name="implied_ids" eval="[(4, ref('custom_deposit.group_custom_deposit_user'))]"/> -->
         </record>
         
         <!-- Crear reglas de acceso -->
