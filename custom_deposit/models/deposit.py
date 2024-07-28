@@ -135,7 +135,7 @@ class Deposit(models.Model):
             ])
             
             if deposit_db:
-                deposit_db.write({ 'estado': 'S' })
+                deposit_db.write({ 'estado': 'C' })
                 import_result['ids'].append(deposit_db.id)
            
         return import_result
