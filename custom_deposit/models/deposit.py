@@ -82,8 +82,8 @@ class Deposit(models.Model):
     @api.onchange('cuenta_bancaria')
     def onchange_cuenta_bancaria(self):
         if self.cuenta_bancaria:
-            cuenta_id = self.env['res.partner.bank'].search([('id', '=', self.cuenta_bancaria.bank_account_id.id)], limit=1)
-            self.numero_cuenta = cuenta_id.acc_number
+            # cuenta_id = self.env['res.partner.bank'].search([('id', '=', self.cuenta_bancaria.bank_account_id.id)], limit=1)
+            self.numero_cuenta = self.cuenta_bancaria.bank_account_id.acc_number
 
             #banco_name = self.env['res.bank'].search([('id', '=', cuenta_id.bank_id)])
             # self.nombre_banco = cuenta_id.bank_id.name
