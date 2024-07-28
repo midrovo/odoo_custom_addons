@@ -84,6 +84,9 @@ class Deposit(models.Model):
         if self.cuenta_bancaria:
             cuenta_id = self.env['res.partner.bank'].search([('id', '=', self.cuenta_bancaria.bank_account_id.id)], limit=1)
             self.numero_cuenta = cuenta_id.acc_number
+
+            banco_name = self.env['res.bank'].search(['id', '=', cuenta_id.bank_id])
+            self.nombre_banco = banco_name.name
     
     @api.model
     def create(self, vals):

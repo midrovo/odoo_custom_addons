@@ -63,6 +63,7 @@
                     <field name="cliente" />
                     <field name="papeleta_deposito" />
                     <field name="numero_cuenta" />
+                    <field name="nombre_banco" />
                     <field name="monto" />
                     <field name="estado"
                            widget="badge"
