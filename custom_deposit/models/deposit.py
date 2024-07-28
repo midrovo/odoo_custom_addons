@@ -51,6 +51,10 @@ class Deposit(models.Model):
     proforma = fields.Char(
         string = 'No. de Proforma',
     )
+
+    nombre_banco = fields.Char(
+        string = 'Banco'
+    )
     
     cuenta_bancaria = fields.Many2one(
         comodel_name = 'account.journal',
