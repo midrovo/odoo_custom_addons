@@ -86,7 +86,8 @@ class Deposit(models.Model):
             self.numero_cuenta = cuenta_id.acc_number
 
             #banco_name = self.env['res.bank'].search([('id', '=', cuenta_id.bank_id)])
-            self.nombre_banco = cuenta_id.bank_id.name
+            # self.nombre_banco = cuenta_id.bank_id.name
+            self.nombre_banco = self.cuenta_bancaria.bank_account_id.bank_id.name
     
     @api.model
     def create(self, vals):
