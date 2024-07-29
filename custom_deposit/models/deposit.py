@@ -53,7 +53,7 @@ class Deposit(models.Model):
     )
 
     nombre_banco = fields.Char(
-        string = 'Banco'
+        string = 'Banco',
         required=True
     )
     
