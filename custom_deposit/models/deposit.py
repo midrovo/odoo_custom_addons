@@ -54,6 +54,7 @@ class Deposit(models.Model):
 
     nombre_banco = fields.Char(
         string = 'Banco'
+        required=True
     )
     
     cuenta_bancaria = fields.Many2one(
@@ -84,9 +85,6 @@ class Deposit(models.Model):
         if self.cuenta_bancaria:
             # cuenta_id = self.env['res.partner.bank'].search([('id', '=', self.cuenta_bancaria.bank_account_id.id)], limit=1)
             self.numero_cuenta = self.cuenta_bancaria.bank_account_id.acc_number
-
-            #banco_name = self.env['res.bank'].search([('id', '=', cuenta_id.bank_id)])
-            # self.nombre_banco = cuenta_id.bank_id.name
             self.nombre_banco = self.cuenta_bancaria.bank_account_id.bank_id.name
     
     @api.model
@@ -97,18 +95,20 @@ class Deposit(models.Model):
         ])
         
         if deposito_existente:
-            numero_de_papeleta = vals['papeleta_deposito']
-            numero_de_cuenta = vals['numero_cuenta']
-            partner_bank = self.env['res.partner.bank'].search([
-                ('acc_number', '=', numero_de_cuenta)
-            ])
+            papeleta = deposito_existente.papeleta_deposito
+            banco = deposito_existente.cuenta_bancaria.bank_account_id.bank_id.name
+            # numero_de_papeleta = vals['papeleta_deposito']
+            # numero_de_cuenta = vals['numero_cuenta']
+            # partner_bank = self.env['res.partner.bank'].search([
+            #     ('acc_number', '=', numero_de_cuenta)
+            # ])
             
-            bank = self.env['res.bank'].search([
-                ('id', '=', partner_bank.bank_id.id)
-            ])
+            # bank = self.env['res.bank'].search([
+            #     ('id', '=', partner_bank.bank_id.id)
+            # ])
             
             raise UserError(
-                f'La papeleta de deposito con este numero: { numero_de_papeleta }  ya existe en { bank.name }.'
+                f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
             )
                  
         vals['estado'] = 'S'
