@@ -38,9 +38,7 @@
                                        options="{'no_create': True, 'no_open': True }"
                                        attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"
                                        />
-                                <field name="nombre_banco" 
-                                       invisible="1"
-                                 />
+                                <field name="nombre_banco" attrs="{ 'invisible': 'True' }"/>
                                 <field name="numero_cuenta"
                                        attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"/>
                                 <field name="doc_deposit"
