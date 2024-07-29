@@ -110,7 +110,10 @@ class Deposit(models.Model):
                 f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
             )
         
-        vals['nombre_banco'] = self.nombre_banco
+        if 'cuenta_bancaria' in vals:
+            cuenta_bancaria = self.env['account.journal'].browse(vals['cuenta_bancaria'])
+            if cuenta_bancaria.bank_account_id:
+                vals['nombre_banco'] = cuenta_bancaria.bank_account_id.bank_id.name
                  
         vals['estado'] = 'S'
             
