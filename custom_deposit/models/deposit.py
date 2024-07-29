@@ -54,7 +54,6 @@ class Deposit(models.Model):
 
     nombre_banco = fields.Char(
         string = 'Banco',
-        required=True
     )
     
     cuenta_bancaria = fields.Many2one(
@@ -110,6 +109,8 @@ class Deposit(models.Model):
             raise UserError(
                 f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
             )
+        
+        vals['nombre_banco'] = self.nombre_banco
                  
         vals['estado'] = 'S'
             
