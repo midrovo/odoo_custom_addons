@@ -80,11 +80,11 @@ class Deposit(models.Model):
     
     ### metodos ###
     @api.onchange('cuenta_bancaria')
-    def onchange_cuenta_bancaria(self):
+    def onchange_cuenta_bancaria(self, vals):
         if self.cuenta_bancaria:
             # cuenta_id = self.env['res.partner.bank'].search([('id', '=', self.cuenta_bancaria.bank_account_id.id)], limit=1)
             self.numero_cuenta = self.cuenta_bancaria.bank_account_id.acc_number
-            self.nombre_banco = self.cuenta_bancaria.bank_account_id.bank_id.name
+            vals['nombre_banco']= self.cuenta_bancaria.bank_account_id.bank_id.name
     
     @api.model
     def create(self, vals):
@@ -110,7 +110,7 @@ class Deposit(models.Model):
                 f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
             )
         
-        vals['nombre_banco'] = self.nombre_banco
+        #vals['nombre_banco'] = self.nombre_banco
                  
         vals['estado'] = 'S'
             
