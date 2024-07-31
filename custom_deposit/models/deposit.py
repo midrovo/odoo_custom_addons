@@ -118,8 +118,9 @@ class Deposit(models.Model):
     
     @api.model
     def load(self, fields, data):
-        contexto = self.env.context
-        _logger.info(f'OBTENIENDO CONTEXTO >>> { contexto }')        
+
+        excel_import = self.env.base
+        _logger.info(f'OBTENIENDO EXCEL >>> { excel_import }')        
         records = [ dict(zip(fields, record)) for record in data ]
        
         import_result = {
