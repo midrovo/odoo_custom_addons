@@ -117,11 +117,9 @@ class Deposit(models.Model):
         return result 
     
     @api.model
-    def execute_import(self, fields, options):
-        _logger.info(f'OBTENIENDO OPTIONS >>> { options }')
-    
-    @api.model
-    def load(self, fields, data):     
+    def load(self, fields, data):  
+        _logger.debug(f'OBTENIENDO DATA { data }')
+
         records = [ dict(zip(fields, record)) for record in data ]
        
         import_result = {
