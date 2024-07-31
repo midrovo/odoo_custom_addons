@@ -118,7 +118,8 @@ class Deposit(models.Model):
     
     @api.model
     def load(self, fields, data):
-        #_logger.info(f'OBTENIENDO OPTIONS >>> { options }')        
+        contexto = self.env.context
+        _logger.info(f'OBTENIENDO CONTEXTO >>> { contexto }')        
         records = [ dict(zip(fields, record)) for record in data ]
        
         import_result = {
