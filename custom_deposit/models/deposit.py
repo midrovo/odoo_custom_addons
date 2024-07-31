@@ -117,10 +117,11 @@ class Deposit(models.Model):
         return result 
     
     @api.model
-    def load(self, fields, data):
-
-        excel_import = self.env['base_import.import'].search([], limit=1)
-        _logger.info(f'OBTENIENDO EXCEL >>> { excel_import.execute_import().sheet }')        
+    def execute_import(self, fields, options):
+        _logger.info(f'OBTENIENDO OPTIONS >>> { options }')
+    
+    @api.model
+    def load(self, fields, data):     
         records = [ dict(zip(fields, record)) for record in data ]
        
         import_result = {
