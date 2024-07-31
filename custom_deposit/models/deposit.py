@@ -82,7 +82,6 @@ class Deposit(models.Model):
     @api.onchange('cuenta_bancaria')
     def onchange_cuenta_bancaria(self):
         if self.cuenta_bancaria:
-            # cuenta_id = self.env['res.partner.bank'].search([('id', '=', self.cuenta_bancaria.bank_account_id.id)], limit=1)
             self.numero_cuenta = self.cuenta_bancaria.bank_account_id.acc_number
             self.nombre_banco = self.cuenta_bancaria.bank_account_id.bank_id.name
     
@@ -96,18 +95,9 @@ class Deposit(models.Model):
         if deposito_existente:
             papeleta = deposito_existente.papeleta_deposito
             banco = deposito_existente.cuenta_bancaria.bank_account_id.bank_id.name
-            # numero_de_papeleta = vals['papeleta_deposito']
-            # numero_de_cuenta = vals['numero_cuenta']
-            # partner_bank = self.env['res.partner.bank'].search([
-            #     ('acc_number', '=', numero_de_cuenta)
-            # ])
-            
-            # bank = self.env['res.bank'].search([
-            #     ('id', '=', partner_bank.bank_id.id)
-            # ])
             
             raise UserError(
-                f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
+                f'La papeleta de deposito con este número: { papeleta }  ya existe en { banco }.'
             )
         
         if 'cuenta_bancaria' in vals:
@@ -127,7 +117,8 @@ class Deposit(models.Model):
         return result 
     
     @api.model
-    def load(self, fields, data):        
+    def load(self, fields, data, options):
+        _logger.info(f'OBTENIENDO OPTIONS { options }')        
         records = [ dict(zip(fields, record)) for record in data ]
        
         import_result = {
@@ -135,12 +126,10 @@ class Deposit(models.Model):
             'messages': [],
             'nextrow': len(data),
         }
-        
-        _logger.info('HOLA ENTRA EN EL LOAD')
        
         for record in records:                      
             deposit_db = self.search([
-                ('numero_cuenta', '=', record['numero_cuenta']),
+                #('numero_cuenta', '=', record['numero_cuenta']),
                 ('papeleta_deposito', '=', record['papeleta_deposito']),
                 ('fecha', '=', record['fecha']),
                 ('monto', '=', record['monto'])
