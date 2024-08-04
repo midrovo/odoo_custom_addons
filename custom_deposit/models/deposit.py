@@ -32,7 +32,7 @@ class Deposit(models.Model):
     )
 
     fecha = fields.Date(
-        string = "Fecha Date",
+        string = "default",
         default = fields.Date.context_today,
         store = False
     )
