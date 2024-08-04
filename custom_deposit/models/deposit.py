@@ -1,7 +1,7 @@
 import logging
 
-from odoo import models, fields, api # type: ignore
-from odoo.exceptions import UserError # type: ignore
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 from datetime import datetime
 
 _logger = logging.getLogger(__name__)
@@ -159,7 +159,7 @@ class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
 
     @api.model
-    def execute_import(self, fields, columns, options, dryrun):
+    def execute_import(self, fields, columns, options, dryrun=False):
         sheet = options.get('sheet', False)
         context = dict(self.env.context, sheet=sheet)
                 
