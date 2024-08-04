@@ -126,8 +126,6 @@ class Deposit(models.Model):
             if '/' not in record['fecha_char'] and '-' not in record['fecha_char']:
                 _logger.info('ENTRA A LA CONDICION >>> SI ESTA / Y -')
 
-
-    
     @api.model
     def load(self, fields, data):
         sheet = self.env.context.get('sheet', False)

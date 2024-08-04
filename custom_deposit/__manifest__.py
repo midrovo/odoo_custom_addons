@@ -15,7 +15,7 @@
     'images': ['static/description/icon-deposito.jpg'],
     'website': "https://www.callphone.com.ec",
     "category": "",
-    "depends": ['base','account'],
+    "depends": ['base','account','base_import'],
     "license": "AGPL-3",
 
     'data': [
