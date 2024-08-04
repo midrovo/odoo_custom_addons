@@ -123,13 +123,16 @@ class Deposit(models.Model):
     
     def parsear_fecha(self, records):
         for record in records:
-            if '/' not in record['fecha_char'] and '-' not in record['fecha_char']:
-                _logger.info('ENTRA A LA CONDICION >>> SI ESTA / Y -')
+            f = record['fecha']
+            if '/' not in f and '-' not in f:
+                _logger.info(f'ENTRA A LA CONDICION SI ESTA (/) Y (-) >>> { f }')
 
     @api.model
     def load(self, fields, data):
         sheet = self.env.context.get('sheet', False)
         number_account = sheet
+
+        _logger.info(f'OBTENIENDO NUMERO DE CUENTA >>> { number_account }')
                 
         records = [ dict(zip(fields, record)) for record in data ]
        
