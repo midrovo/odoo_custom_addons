@@ -125,7 +125,9 @@ class Deposit(models.Model):
         for record in records:
             f = record['fecha_char']
             if '/' not in f and '-' not in f:
-                _logger.info(f'ENTRA A LA CONDICION SI ESTA (/) Y (-) >>> { f }')
+                _logger.info('VACIO')
+            else:
+                _logger.info(f'FECHA BIEN FORMATEADA >>> { f }')
 
     @api.model
     def load(self, fields, data):
