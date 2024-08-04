@@ -123,7 +123,7 @@ class Deposit(models.Model):
     
     def parsear_fecha(self, records):
         for record in records:
-            f = record['fecha']
+            f = record['fecha_char']
             if '/' not in f and '-' not in f:
                 _logger.info(f'ENTRA A LA CONDICION SI ESTA (/) Y (-) >>> { f }')
 
