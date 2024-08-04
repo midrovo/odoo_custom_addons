@@ -1,7 +1,7 @@
 import logging
 
-from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo import models, fields, api # type: ignore
+from odoo.exceptions import UserError # type: ignore
 from datetime import datetime
 
 _logger = logging.getLogger(__name__)
