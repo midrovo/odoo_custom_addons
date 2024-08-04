@@ -124,17 +124,17 @@ class Deposit(models.Model):
     def parsear_fecha(self, records):
         for record in records:
             f = record['fecha_char']
-            if '/' not in f and '-' not in f:
-                _logger.info('VACIO')
-            else:
-                _logger.info(f'FECHA BIEN FORMATEADA >>> { f }')
+            # if '/' not in f and '-' not in f:
+            #     _logger.info('VACIO')
+            # else:
+            #     _logger.info(f'FECHA BIEN FORMATEADA >>> { f }')
 
     @api.model
     def load(self, fields, data):
-        sheet = self.env.context.get('sheet', False)
+        sheet = self.env.context
         number_account = sheet
 
-        _logger.info(f'OBTENIENDO NUMERO DE CUENTA >>> { number_account }')
+        _logger.info(f'OBTENIENDO CONTEXT >>> { number_account }')
                 
         records = [ dict(zip(fields, record)) for record in data ]
        
