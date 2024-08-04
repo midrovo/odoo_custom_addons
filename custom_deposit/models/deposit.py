@@ -162,8 +162,5 @@ class CustomBaseImport(models.TransientModel):
     def execute_import(self, fields, columns, options, dryrun=False):
         sheet = options.get('sheet', False)
         context = dict(self.env.context, sheet=sheet)
-
-        if 'dryrun' not in options:
-            options['dryrun'] = dryrun
                 
-        return super(CustomBaseImport, self.with_context(context)).execute_import(fields, columns, options)
+        return super(CustomBaseImport, self.with_context(context)).execute_import(fields, columns, options, dryrun)

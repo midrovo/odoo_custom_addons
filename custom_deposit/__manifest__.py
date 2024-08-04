@@ -14,7 +14,7 @@
     'author': "Mauricio Idrovo",
     'images': ['static/description/icon-deposito.jpg'],
     'website': "https://www.callphone.com.ec",
-    "category": "",
+    "category": "Tools",
     "depends": ['base','account','base_import'],
     "license": "AGPL-3",
 
