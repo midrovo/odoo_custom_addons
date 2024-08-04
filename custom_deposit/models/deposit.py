@@ -1,13 +1,9 @@
+import logging
+
 from odoo import models, fields, api # type: ignore
 from odoo.exceptions import UserError # type: ignore
-from datetime import date, datetime
-import pytz
-from dateutil import parser
-from dateutil.parser import ParserError
+from datetime import datetime
 
-local_tz = pytz.timezone('America/Guayaquil')
-
-import logging
 _logger = logging.getLogger(__name__)
 
 class Deposit(models.Model):
@@ -16,7 +12,7 @@ class Deposit(models.Model):
     
     ### atributos ###
     papeleta_deposito = fields.Char(
-        string = 'Ref. del deposito',
+        string = 'No. de Deposito',
     )
     
     cliente = fields.Many2one(
@@ -36,8 +32,13 @@ class Deposit(models.Model):
     )
 
     fecha = fields.Date(
+        string = "Fecha Date",
+        default = fields.Date.context_today,
+        store = False
+    )
+    
+    fecha_char = fields.Char(
         string = 'Fecha',
-        default = datetime.today()
     )
 
     nota = fields.Char(
@@ -89,7 +90,7 @@ class Deposit(models.Model):
     def create(self, vals):
         deposito_existente = self.search([
             ('papeleta_deposito', '=', vals['papeleta_deposito']),
-            ('numero_cuenta', '=', vals['numero_cuenta'])
+            ('numero_cuenta', '=', vals['numero_cuenta'] or None)
         ])
         
         if deposito_existente:
@@ -97,7 +98,7 @@ class Deposit(models.Model):
             banco = deposito_existente.cuenta_bancaria.bank_account_id.bank_id.name
             
             raise UserError(
-                f'La papeleta de deposito con este número: { papeleta }  ya existe en { banco }.'
+                f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
             )
         
         if 'cuenta_bancaria' in vals:
@@ -106,6 +107,10 @@ class Deposit(models.Model):
                 vals['nombre_banco'] = cuenta_bancaria.bank_account_id.bank_id.name
                  
         vals['estado'] = 'S'
+
+        fecha_date = datetime.strptime(vals['fecha'], '%Y-%m-%d').date()
+        fecha_formateada = fecha_date.strftime('%d/%m/%Y')
+        vals['fecha_char'] = fecha_formateada
             
         return super(Deposit, self).create(vals)        
     
@@ -114,12 +119,20 @@ class Deposit(models.Model):
         for record in self:
             name = record.papeleta_deposito or 'Sin referencia'
             result.append((record.id, name))
-        return result 
+        return result
+    
+    def parsear_fecha(self, records):
+        for record in records:
+            if '/' not in record['fecha_char'] and '-' not in record['fecha_char']:
+                _logger.info('ENTRA A LA CONDICION >>> SI ESTA / Y -')
+
+
     
     @api.model
-    def load(self, fields, data):  
-        _logger.debug(f'OBTENIENDO DATA { data }')
-
+    def load(self, fields, data):
+        sheet = self.env.context.get('sheet', False)
+        number_account = sheet
+                
         records = [ dict(zip(fields, record)) for record in data ]
        
         import_result = {
@@ -127,12 +140,12 @@ class Deposit(models.Model):
             'messages': [],
             'nextrow': len(data),
         }
-       
-        for record in records:                      
+                
+        for record in records:                                                 
             deposit_db = self.search([
-                #('numero_cuenta', '=', record['numero_cuenta']),
+                ('numero_cuenta', '=', number_account),
                 ('papeleta_deposito', '=', record['papeleta_deposito']),
-                ('fecha', '=', record['fecha']),
+                # ('fecha', '=', record['fecha']),
                 ('monto', '=', record['monto'])
             ])
             
@@ -141,3 +154,13 @@ class Deposit(models.Model):
                 import_result['ids'].append(deposit_db.id)
            
         return import_result
+
+class CustomBaseImport(models.TransientModel):
+    _inherit = 'base_import.import'
+
+    @api.model
+    def execute_import(self, fields, columns, options, dryrun=False):
+        sheet = options.get('sheet', False)
+        context = dict(self.env.context, sheet=sheet)
+                
+        return super(CustomBaseImport, self.with_context(context)).execute_import(fields, columns, options, dryrun)
