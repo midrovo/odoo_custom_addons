@@ -159,7 +159,7 @@ class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
 
     @api.model
-    def execute_import(self, fields, columns, options, dryrun=True):
+    def execute_import(self, fields, columns, options, dryrun=False):
         sheet = options.get('sheet', False)
         context = dict(self.env.context, sheet=sheet)
                 
