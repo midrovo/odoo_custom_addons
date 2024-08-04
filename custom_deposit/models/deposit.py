@@ -140,6 +140,8 @@ class Deposit(models.Model):
             'messages': [],
             'nextrow': len(data),
         }
+
+        self.parsear_fecha(records)
                 
         for record in records:                                                 
             deposit_db = self.search([
