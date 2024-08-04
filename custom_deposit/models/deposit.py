@@ -134,7 +134,9 @@ class Deposit(models.Model):
         sheet = self.env.context
         number_account = sheet
 
-        _logger.info(f'OBTENIENDO CONTEXT >>> { number_account }')
+        base_import = self.env['base_import.import'].search([], limit=1)
+
+        _logger.info(f'OBTENIENDO EL IMPORT >>> { base_import }')
                 
         records = [ dict(zip(fields, record)) for record in data ]
        
