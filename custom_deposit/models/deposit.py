@@ -145,7 +145,7 @@ class Deposit(models.Model):
             'nextrow': len(data),
         }
 
-        self.parsear_fecha(records)
+        self.parsear_fechas(records)
                 
         for record in records:                                                 
             deposit_db = self.search([
