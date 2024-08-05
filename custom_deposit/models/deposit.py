@@ -162,12 +162,12 @@ class Deposit(models.Model):
            
         return import_result
 
-# class CustomBaseImport(models.TransientModel):
-#     _inherit = 'base_import.import'
+class CustomBaseImport(models.TransientModel):
+    _inherit = 'base_import.import'
 
-#     @api.model
-#     def execute_import(self, fields, columns, options, dryrun=False):
-#         sheet = options.get('sheet', False)
-#         context = dict(self.env.context, sheet=sheet)
+    @api.model
+    def execute_import(self, fields, columns, options, dryrun=False):
+        sheet = options.get('sheet', False)
+        context = dict(self.env.context, sheet=sheet)
                 
-#         return super(CustomBaseImport, self.with_context(context)).execute_import(fields, columns, options, dryrun)
+        return super(CustomBaseImport, self.with_context(context)).execute_import(fields, columns, options, dryrun)
