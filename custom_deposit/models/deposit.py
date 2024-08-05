@@ -131,7 +131,7 @@ class Deposit(models.Model):
 
     @api.model
     def load(self, fields, data):
-        sheet = self.env.context
+        sheet = self.env.context.get('sheet', False)
         number_account = sheet
 
         base_import = self.env['base_import.import'].search([], limit=1)
