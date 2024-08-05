@@ -126,7 +126,7 @@ class Deposit(models.Model):
             fecha_record = record['fecha_char']
             if '/' not in fecha_record and '-' not in fecha_record:
                 number_days = int(fecha_record)
-                record['fecha_char'] = datetime(1900,1,1).date() + timedelta(days=(number_days - 1))
+                record['fecha_char'] = datetime(1899,12,30).date() + timedelta(days=(number_days))
                 fecha_formateada = record['fecha_char']
                 _logger.info(f'MOSTRANDO FECHA >>> { fecha_formateada }')
             else:
