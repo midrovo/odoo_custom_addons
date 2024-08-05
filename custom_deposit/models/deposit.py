@@ -2,7 +2,7 @@ import logging
 
 from odoo import models, fields, api # type: ignore
 from odoo.exceptions import UserError # type: ignore
-from datetime import datetime
+from datetime import datetime, timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -121,22 +121,21 @@ class Deposit(models.Model):
             result.append((record.id, name))
         return result
     
-    def parsear_fecha(self, records):
+    def parsear_fechas(self, records):
         for record in records:
-            f = record['fecha_char']
-            # if '/' not in f and '-' not in f:
-            #     _logger.info('VACIO')
-            # else:
-            #     _logger.info(f'FECHA BIEN FORMATEADA >>> { f }')
+            fecha_record = record['fecha_char']
+            if '/' not in fecha_record and '-' not in fecha_record:
+                number_days = int(fecha_record)
+                record['fecha_char'] = datetime(1900,1,1).date() + timedelta(days=(number_days - 1))
+                fecha_formateada = record['fecha_char']
+                _logger.info(f'MOSTRANDO FECHA >>> { fecha_formateada }')
+            else:
+                _logger.info(f'FECHA BIEN FORMATEADA >>> { fecha_record }')
 
     @api.model
     def load(self, fields, data):
         sheet = self.env.context.get('sheet', False)
         number_account = sheet
-
-        base_import = self.env['base_import.import'].search([], limit=1)
-
-        _logger.info(f'OBTENIENDO EL SHEET >>> { number_account }')
                 
         records = [ dict(zip(fields, record)) for record in data ]
        
@@ -152,7 +151,7 @@ class Deposit(models.Model):
             deposit_db = self.search([
                 ('numero_cuenta', '=', number_account),
                 ('papeleta_deposito', '=', record['papeleta_deposito']),
-                # ('fecha', '=', record['fecha']),
+                # ('fecha', '=', record['fecha_char']),
                 ('monto', '=', record['monto'])
             ])
             
