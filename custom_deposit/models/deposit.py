@@ -131,8 +131,8 @@ class Deposit(models.Model):
         
         buscar_cuenta = self.search([('numero_cuenta', '=', sheet)])
         
-        if not buscar_cuenta:
-            raise UserError(f'El número de cuenta ingresada no existe o es incorrecta { sheet }')
+        # if not buscar_cuenta:
+        #     raise UserError(f'El número de cuenta ingresada no existe o es incorrecta { sheet }')
         
         number_account = sheet
                 
