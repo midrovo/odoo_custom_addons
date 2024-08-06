@@ -149,33 +149,13 @@ class Deposit(models.Model):
         for record in records:
             fecha_record = record['fecha_char']
             
-            if '/' in fecha_record:
-                fecha_date = datetime.strptime(fecha_record, '%d/%m/%Y').date()
-                fecha_record = fecha_date.strftime('%Y-%m-%d')
-                fecha_record = datetime.strptime(fecha_record, '%Y-%m-%d').date()
-                record['fecha_char'] = fecha_record
-                
-            else:
-                fecha_date = datetime.strptime(fecha_record, '%Y-%m-%d').date()
-                fecha_record = fecha_date
-                
-            dia = fecha_record.day
-            mes = fecha_record.month
-            anio = fecha_record.year
-            
-            if dia <= fecha_actual.month:
-                fecha_record = fecha_record.replace(month=dia, day=mes)
-            
-            record['fecha_char'] = fecha_record
-            
-            fecha_format = record['fecha_char']
-            _logger.info(f'OBTENIENDO FECHA { fecha_format }')
+            _logger.info(f'OBTENIENDO FECHA { fecha_record }')
                                                              
             deposit_db = self.search([
-                ('numero_cuenta', '=', number_account),
-                ('papeleta_deposito', '=', record['papeleta_deposito']),
+                # ('numero_cuenta', '=', number_account),
+                # ('papeleta_deposito', '=', record['papeleta_deposito']),
                 ('fecha', '=', record['fecha_char']),
-                ('monto', '=', record['monto'])
+                # ('monto', '=', record['monto'])
             ])
             
             if deposit_db:
@@ -190,11 +170,19 @@ class Deposit(models.Model):
             if '/' not in fecha_record and '-' not in fecha_record:
                 number_days = int(fecha_record)
                 record['fecha_char'] = self.excel_date_to_datetime(number_days)
+
+            if '/' in fecha_record:
+                fecha_record = datetime.strptime(fecha_record, '%Y-%m-%d').date()
+                record['fecha_char'] = fecha_record
                      
     def excel_date_to_datetime(self, excel_date):
-        fecha_parseada = datetime(1899,12,30).date() + timedelta(days=(excel_date))
-        fecha_formateada = fecha_parseada.strftime('%d/%m/%Y')
-        return fecha_formateada
+        fecha_convertida = datetime(1899,12,30).date() + timedelta(days=(excel_date))
+        return fecha_convertida
+
+    def extraer_fechas_exactas(records):
+        fechas = []
+
+        for 
                 
 class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
