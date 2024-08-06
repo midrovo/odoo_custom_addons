@@ -179,10 +179,10 @@ class Deposit(models.Model):
         fecha_convertida = datetime(1899,12,30).date() + timedelta(days=(excel_date))
         return fecha_convertida
 
-    def extraer_fechas_exactas(records):
-        fechas = []
+    # def extraer_fechas_exactas(records):
+    #     fechas = []
 
-        for 
+    #     for 
                 
 class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
