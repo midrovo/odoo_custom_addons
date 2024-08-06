@@ -193,7 +193,7 @@ class Deposit(models.Model):
     def fechas_congruentes(self, fechas):
         fechas_congruentes = []
         for fecha in fechas:
-            if fecha.day >= 13 and fecha.month <= 1:
+            if fecha.day >= 1 and fecha.day <= 31:
                 fechas_congruentes.append(fecha)
 
         return fechas_congruentes
