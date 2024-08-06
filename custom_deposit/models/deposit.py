@@ -146,11 +146,12 @@ class Deposit(models.Model):
         
         self.parsear_fechas(records)
         fechas = self.extraer_fechas(records)
+        fechas_correctas = self.fechas_congruentes(fechas)
+
+        _logger.info(f'FECHAS CORRECTAS >>> { fechas_correctas }')
                 
         for record in records:
             fecha_record = record['fecha_char']
-            
-            _logger.info(f'OBTENIENDO FECHA { fecha_record }')
                                                              
             deposit_db = self.search([
                 # ('numero_cuenta', '=', number_account),
@@ -187,9 +188,19 @@ class Deposit(models.Model):
             fecha_record = datetime.strptime(record['fecha_char'], '%Y-%m-%d').date()
             fechas.append(fecha_record)
 
-        _logger.info(f'LISTA DE FECHAS EXACTAS >>> { fechas }')
-
         return fechas
+    
+    def fechas_congruentes(self, fechas):
+        fechas_congruentes = []
+        for fecha in fechas:
+            if fecha.day >= 13 and fecha.month <= 1:
+                fechas_congruentes.append(fecha)
+
+        return fechas_congruentes
+
+
+
+        
                 
 class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
