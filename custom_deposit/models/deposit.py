@@ -145,6 +145,7 @@ class Deposit(models.Model):
         }
         
         self.parsear_fechas(records)
+        self.extraer_fechas_exactas(records)
                 
         for record in records:
             fecha_record = record['fecha_char']
@@ -179,10 +180,17 @@ class Deposit(models.Model):
         fecha_convertida = datetime(1899,12,30).date() + timedelta(days=(excel_date))
         return fecha_convertida
 
-    # def extraer_fechas_exactas(records):
-    #     fechas = []
+    def extraer_fechas_exactas(self, records):
+        fechas = []
 
-    #     for 
+        for record in records:
+            fecha_record = datetime.strptime(record['fecha_char'], '%Y-%m-%d').date()
+            day = fecha_record.day
+
+            if day <= 31 and day >= 1:
+                fechas.append(fecha_record)
+
+        _logger.info(f'LISTA DE FECHAS EXACTAS >>> { fechas }')
                 
 class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
