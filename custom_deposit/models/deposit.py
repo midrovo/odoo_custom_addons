@@ -145,7 +145,7 @@ class Deposit(models.Model):
         }
         
         self.parsear_fechas(records)
-        fechas = self.extraer_fechas_exactas(records)
+        fechas = self.extraer_fechas(records)
                 
         for record in records:
             fecha_record = record['fecha_char']
