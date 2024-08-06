@@ -2,7 +2,7 @@ import logging
 
 from odoo import models, fields, api # type: ignore
 from odoo.exceptions import UserError # type: ignore
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -13,16 +13,19 @@ class Deposit(models.Model):
     ### atributos ###
     papeleta_deposito = fields.Char(
         string = 'No. de Deposito',
+        required = True
     )
     
     cliente = fields.Many2one(
         string = 'Cliente',
         comodel_name = 'res.partner',
+        required = True
     )
 
     monto = fields.Monetary(
         string = 'Monto',
         currency_field = "moneda",
+        required = True
     )
     
     moneda = fields.Many2one(
@@ -34,7 +37,6 @@ class Deposit(models.Model):
     fecha = fields.Date(
         string = "default",
         default = fields.Date.context_today,
-        store = False
     )
     
     fecha_char = fields.Char(
@@ -51,6 +53,7 @@ class Deposit(models.Model):
 
     proforma = fields.Char(
         string = 'No. de Proforma',
+        required = True
     )
 
     nombre_banco = fields.Char(
@@ -90,7 +93,7 @@ class Deposit(models.Model):
     def create(self, vals):
         deposito_existente = self.search([
             ('papeleta_deposito', '=', vals['papeleta_deposito']),
-            ('numero_cuenta', '=', vals['numero_cuenta'] or None)
+            ('numero_cuenta', '=', vals['numero_cuenta'])
         ])
         
         if deposito_existente:
@@ -107,10 +110,10 @@ class Deposit(models.Model):
                 vals['nombre_banco'] = cuenta_bancaria.bank_account_id.bank_id.name
                  
         vals['estado'] = 'S'
-
-        fecha_date = datetime.strptime(vals['fecha'], '%Y-%m-%d').date()
-        fecha_formateada = fecha_date.strftime('%d/%m/%Y')
-        vals['fecha_char'] = fecha_formateada
+        
+        fecha = datetime.strptime(vals['fecha'], '%Y-%m-%d')
+        
+        vals['fecha_char'] = fecha.strftime('%d/%m/%Y')
             
         return super(Deposit, self).create(vals)        
     
@@ -121,20 +124,16 @@ class Deposit(models.Model):
             result.append((record.id, name))
         return result
     
-    def parsear_fechas(self, records):
-        for record in records:
-            fecha_record = record['fecha_char']
-            if '/' not in fecha_record and '-' not in fecha_record:
-                number_days = int(fecha_record)
-                record['fecha_char'] = datetime(1899,12,30).date() + timedelta(days=(number_days))
-                fecha_formateada = record['fecha_char']
-                _logger.info(f'MOSTRANDO FECHA >>> { fecha_formateada }')
-            else:
-                _logger.info(f'FECHA BIEN FORMATEADA >>> { fecha_record }')
-
     @api.model
     def load(self, fields, data):
+        fecha_actual = date.today()
         sheet = self.env.context.get('sheet', False)
+        
+        buscar_cuenta = self.search([('numero_cuenta', '=', sheet)])
+        
+        if not buscar_cuenta:
+            raise UserError(f'El número de cuenta ingresada no existe o es incorrecta { sheet }')
+        
         number_account = sheet
                 
         records = [ dict(zip(fields, record)) for record in data ]
@@ -144,14 +143,38 @@ class Deposit(models.Model):
             'messages': [],
             'nextrow': len(data),
         }
-
+        
         self.parsear_fechas(records)
                 
-        for record in records:                                                 
+        for record in records:
+            fecha_record = record['fecha_char']
+            
+            if '/' in fecha_record:
+                fecha_date = datetime.strptime(fecha_record, '%d/%m/%Y').date()
+                fecha_record = fecha_date.strftime('%Y-%m-%d')
+                fecha_record = datetime.strptime(fecha_record, '%Y-%m-%d').date()
+                record['fecha_char'] = fecha_record
+                
+            else:
+                fecha_date = datetime.strptime(fecha_record, '%Y-%m-%d').date()
+                fecha_record = fecha_date
+                
+            dia = fecha_record.day
+            mes = fecha_record.month
+            anio = fecha_record.year
+            
+            if dia <= fecha_actual.month:
+                fecha_record = fecha_record.replace(month=dia, day=mes)
+            
+            record['fecha_char'] = fecha_record
+            
+            fecha_format = record['fecha_char']
+            _logger.info(f'OBTENIENDO FECHA { fecha_format }')
+                                                             
             deposit_db = self.search([
                 ('numero_cuenta', '=', number_account),
                 ('papeleta_deposito', '=', record['papeleta_deposito']),
-                # ('fecha', '=', record['fecha_char']),
+                ('fecha', '=', record['fecha_char']),
                 ('monto', '=', record['monto'])
             ])
             
@@ -160,11 +183,22 @@ class Deposit(models.Model):
                 import_result['ids'].append(deposit_db.id)
            
         return import_result
-
+    
+    def parsear_fechas(self, records):
+        for record in records:
+            fecha_record = record['fecha_char']
+            if '/' not in fecha_record and '-' not in fecha_record:
+                number_days = int(fecha_record)
+                record['fecha_char'] = self.excel_date_to_datetime(number_days)
+                     
+    def excel_date_to_datetime(self, excel_date):
+        fecha_parseada = datetime(1899,12,30).date() + timedelta(days=(excel_date))
+        fecha_formateada = fecha_parseada.strftime('%d/%m/%Y')
+        return fecha_formateada
+                
 class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
 
-    # @api.model
     def execute_import(self, fields, columns, options, dryrun=False):
         sheet = options.get('sheet', False)
         context = dict(self.env.context, sheet=sheet)

@@ -30,7 +30,7 @@
                                     <field name="monto" />
                                     <field name="moneda" options="{'no_create': True, 'no_open': True }" />
                                 </div>
-                                <field name="fecha" />
+                                <field name="fecha" string="Fecha" />
                             </group>
                             <group name="group_right">
                                 <field name="proforma" />
@@ -60,6 +60,7 @@
             <field name="arch" type="xml">
                 <tree string="Depositos">
                     <field name="fecha_char" />
+                    <field name="fecha" string="Fecha Date" />
                     <field name="cliente" />
                     <field name="papeleta_deposito" />
                     <field name="numero_cuenta" />
