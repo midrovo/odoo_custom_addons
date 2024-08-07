@@ -73,6 +73,7 @@ class Deposit(models.Model):
     estado = fields.Selection(
         [('B', 'Borrador'), ('S', 'Subido'), ('C', 'Confirmado'), ('F', 'Facturado')],
         string = 'Estado',
+        default = 'B'
     )
     
     vendedor = fields.Many2one(
@@ -133,9 +134,7 @@ class Deposit(models.Model):
     
     @api.model
     def load(self, fields, data):
-        fecha_actual = date.today()
         sheet = self.env.context.get('sheet', False)
-        
         account = sheet.strip()
         
         buscar_cuenta = self.search([('numero_cuenta', '=', account)])
