@@ -8,13 +8,13 @@
                     <header>
                         <field name="estado" 
                                widget="statusbar"
-                               statusbar_visible="S,C,F"/>
+                               statusbar_visible="B,S,C,F"/>
                     </header>
                     <sheet>
                         <div class="oe_title" style="padding: 5px 0">
                             <h2 class="o_row">
                                 Papeleta de Deposito: 
-                                <span attrs="{ 'invisible': [('estado','not in',[ 'S','C','F' ])] }">
+                                <span attrs="{ 'invisible': [('estado','not in',[ 'B','S','C','F' ])] }">
                                     <field name="papeleta_deposito" 
                                            attrs="{ 'readonly': True }"/>
                                 </span>
@@ -22,8 +22,7 @@
                         </div>
                         <group name="group_top">
                             <group name="group_left">
-                                <field name="papeleta_deposito"
-                                       attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"/>
+                                <field name="papeleta_deposito"/>
                                 <field name="cliente" />
                                 <label for="monto"/>
                                 <div class="o_row">
@@ -35,17 +34,15 @@
                             <group name="group_right">
                                 <field name="proforma" />
                                 <field name="cuenta_bancaria" 
-                                       options="{'no_create': True, 'no_open': True }"
-                                       attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"
-                                       />
+                                       options="{'no_create': True, 'no_open': True }"/>
                                 <field name="numero_cuenta"
-                                       attrs="{ 'readonly': [('estado', 'in', ['S','C','F'])] }"/>
+                                       attrs="{ 'readonly': [('estado', 'in', ['B','S','C','F'])] }"/>
                                 <field name="doc_deposit"
                                        widget="image"
                                        options="{ 'size': [100, 100] }" />
                                 <field name="nota" />
                                 <field name="vendedor"
-                                       attrs="{ 'invisible': [('estado', '!=', 'S')] }"
+                                       attrs="{ 'invisible': [('estado', 'not in', ['S','C','F'])] }"
                                        options="{'no_create': True, 'no_open': True }" />
                             </group>
                         </group>
@@ -60,7 +57,6 @@
             <field name="arch" type="xml">
                 <tree string="Depositos">
                     <field name="fecha_char" />
-                    <field name="fecha" string="Fecha Date" />
                     <field name="cliente" />
                     <field name="papeleta_deposito" />
                     <field name="numero_cuenta" />

@@ -71,7 +71,7 @@ class Deposit(models.Model):
     )
 
     estado = fields.Selection(
-        [('S', 'Subido'), ('C', 'Confirmado'), ('F', 'Facturado')],
+        [('B', 'Borrador'), ('S', 'Subido'), ('C', 'Confirmado'), ('F', 'Facturado')],
         string = 'Estado',
     )
     
@@ -101,7 +101,7 @@ class Deposit(models.Model):
             banco = deposito_existente.cuenta_bancaria.bank_account_id.bank_id.name
             
             raise UserError(
-                f'La papeleta de deposito con este numero: { papeleta }  ya existe en { banco }.'
+                f'La papeleta de deposito con el número: { papeleta }  ya existe en: { banco }.'
             )
         
         if 'cuenta_bancaria' in vals:
@@ -115,7 +115,14 @@ class Deposit(models.Model):
         
         vals['fecha_char'] = fecha.strftime('%d/%m/%Y')
             
-        return super(Deposit, self).create(vals)        
+        return super(Deposit, self).create(vals)
+    
+    def write(self, vals):
+        if vals.get('fecha'):
+            fecha = datetime.strptime(vals['fecha'], '%Y-%m-%d')
+            vals['fecha_char'] = fecha.strftime('%d/%m/%Y')
+            
+        return super(Deposit, self).write(vals)
     
     def name_get(self):
         result = []
@@ -129,10 +136,12 @@ class Deposit(models.Model):
         fecha_actual = date.today()
         sheet = self.env.context.get('sheet', False)
         
-        buscar_cuenta = self.search([('numero_cuenta', '=', sheet)])
+        account = sheet.strip()
         
-        # if not buscar_cuenta:
-        #     raise UserError(f'El número de cuenta ingresada no existe o es incorrecta { sheet }')
+        buscar_cuenta = self.search([('numero_cuenta', '=', account)])
+        
+        if not buscar_cuenta:
+            raise UserError(f'El número de cuenta ingresada no existe o es incorrecta { sheet }')
         
         number_account = sheet
                 
@@ -143,21 +152,19 @@ class Deposit(models.Model):
             'messages': [],
             'nextrow': len(data),
         }
+            
+        control = self.verificar_fechas_correctas(records)
         
-        self.parsear_fechas(records)
-        fechas = self.extraer_fechas(records)
-        fechas_correctas = self.fechas_congruentes(fechas)
-
-        _logger.info(f'FECHAS CORRECTAS >>> { fechas_correctas }')
+        if not control:
+            self.parsear_fechas(records)
+            self.modificar_fechas(records)
                 
-        for record in records:
-            fecha_record = record['fecha_char']
-                                                             
+        for record in records:                                                             
             deposit_db = self.search([
-                # ('numero_cuenta', '=', number_account),
-                # ('papeleta_deposito', '=', record['papeleta_deposito']),
+                ('numero_cuenta', '=', number_account),
+                ('papeleta_deposito', '=', record['papeleta_deposito']),
                 ('fecha', '=', record['fecha_char']),
-                # ('monto', '=', record['monto'])
+                ('monto', '=', record['monto'])
             ])
             
             if deposit_db:
@@ -173,36 +180,52 @@ class Deposit(models.Model):
                 number_days = int(fecha_record)
                 record['fecha_char'] = self.excel_date_to_datetime(number_days)
 
-            if '/' in fecha_record:
+            elif '/' in fecha_record:
+                fecha_record = datetime.strptime(fecha_record, '%d/%m/%Y').date()
+                fecha_record = fecha_record.strftime('%Y-%m-%d')
+                fecha_record = datetime.strptime(fecha_record, '%Y-%m-%d').date()
+                record['fecha_char'] = fecha_record
+                
+            elif '-' in fecha_record:
                 fecha_record = datetime.strptime(fecha_record, '%Y-%m-%d').date()
                 record['fecha_char'] = fecha_record
                      
     def excel_date_to_datetime(self, excel_date):
         fecha_convertida = datetime(1899,12,30).date() + timedelta(days=(excel_date))
         return fecha_convertida
-
-    def extraer_fechas(self, records):
-        fechas = []
-
-        for record in records:
-            fecha_record = datetime.strptime(record['fecha_char'], '%Y-%m-%d').date()
-            fechas.append(fecha_record)
-
-        return fechas
     
-    def fechas_congruentes(self, fechas):
-        if fechas:
-            fechas_congruentes = []
-            for fecha in fechas:
-                _logger.info(f'FECH >>> { fecha }')
-                if fecha.day >= 13 and fecha.day <= 31:
-                    fechas_congruentes.append(fecha)
-
-            return fechas_congruentes
-
-
-
+    def verificar_fechas_correctas(self, records):
+        if records:
+            longitud = len(records)
+            contador_slash = 0
+            contador_guion = 0
+            for record in records:
+                fecha_record = record['fecha_char']
+                if '/' in fecha_record:
+                    contador_slash = contador_slash + 1
+                    
+                elif '-' in fecha_record:
+                    contador_guion = contador_guion + 1
+                    
+            if contador_slash == longitud or contador_guion == longitud:
+                return True
+            
+            return False    
+    
+    def modificar_fechas(self, fechas):
+        fecha_actual = date.today()
+        mes_actual = fecha_actual.month
+        anio_actual = fecha_actual.year
         
+        for fecha_date in fechas:
+            if fecha_date['fecha_char'].month <= mes_actual:
+                if fecha_date['fecha_char'].day <= mes_actual and fecha_date['fecha_char'].year == anio_actual:
+                    fecha_modificada = fecha_date['fecha_char'].replace(month=fecha_date['fecha_char'].day, day=fecha_date['fecha_char'].month)
+                    fecha_date['fecha_char'] = fecha_modificada
+            
+            elif fecha_date['fecha_char'].year == anio_actual:
+                fecha_modificada = fecha_date['fecha_char'].replace(month=fecha_date['fecha_char'].day, day=fecha_date['fecha_char'].month)
+                fecha_date['fecha_char'] = fecha_modificada        
                 
 class CustomBaseImport(models.TransientModel):
     _inherit = 'base_import.import'
@@ -210,5 +233,5 @@ class CustomBaseImport(models.TransientModel):
     def execute_import(self, fields, columns, options, dryrun=False):
         sheet = options.get('sheet', False)
         context = dict(self.env.context, sheet=sheet)
-                
+           
         return super(CustomBaseImport, self.with_context(context)).execute_import(fields, columns, options, dryrun)
