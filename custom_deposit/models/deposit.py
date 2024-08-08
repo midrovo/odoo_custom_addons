@@ -1,18 +1,18 @@
 import logging
 
 from odoo import models, fields, api # type: ignore
-from odoo.exceptions import UserError # type: ignore
+from odoo.exceptions import UserError, ValidationError # type: ignore
 from datetime import date, datetime, timedelta
 
 _logger = logging.getLogger(__name__)
 
 class Deposit(models.Model):
     _name = 'custom.deposit'
-    _description = 'Modelo para la gestion de depositos'
+    _description = 'Modelo para la gestion de depósitos'
     
     ### atributos ###
     papeleta_deposito = fields.Char(
-        string = 'No. de Deposito',
+        string = 'No. de Depósito',
         required = True
     )
     
@@ -41,6 +41,9 @@ class Deposit(models.Model):
     
     fecha_char = fields.Char(
         string = 'Fecha',
+        compute = '_compute_fecha',
+        readonly = False,
+        store = True
     )
 
     nota = fields.Char(
@@ -63,7 +66,8 @@ class Deposit(models.Model):
     cuenta_bancaria = fields.Many2one(
         comodel_name = 'account.journal',
         string = 'Cuenta Bancaria de la Empresa',
-        domain="[('type','=','bank')]"        
+        domain="[('type','=','bank')]",
+        required= True
     )
     
     numero_cuenta = fields.Char(
@@ -89,39 +93,62 @@ class Deposit(models.Model):
         if self.cuenta_bancaria:
             self.numero_cuenta = self.cuenta_bancaria.bank_account_id.acc_number
             self.nombre_banco = self.cuenta_bancaria.bank_account_id.bank_id.name
-    
+            
+    @api.depends('fecha')
+    def _compute_fecha(self):
+        for record in self:
+            record.fecha_char = record.fecha.strftime('%d/%m/%Y')
+            
+            
+    @api.constrains('papeleta_deposito', 'numero_cuenta')
+    def check_fields(self):
+        for record in self:
+            if record.papeleta_deposito and record.numero_cuenta:
+                deposito_existente = self.search([
+                    ('papeleta_deposito', '=', record.papeleta_deposito),
+                    ('numero_cuenta', '=', record.numero_cuenta),
+                    ('id', '!=', record.id)
+                ])
+                
+                if deposito_existente:
+                    papeleta = deposito_existente.papeleta_deposito
+                    banco = deposito_existente.cuenta_bancaria.bank_account_id.bank_id.name
+                    
+                    raise ValidationError(
+                        f'La papeleta de deposito con el número: { papeleta } ya existe en: { banco }.'
+                    )
+                    
     @api.model
     def create(self, vals):
-        deposito_existente = self.search([
-            ('papeleta_deposito', '=', vals['papeleta_deposito']),
-            ('numero_cuenta', '=', vals['numero_cuenta'])
-        ])
-        
-        if deposito_existente:
-            papeleta = deposito_existente.papeleta_deposito
-            banco = deposito_existente.cuenta_bancaria.bank_account_id.bank_id.name
-            
-            raise UserError(
-                f'La papeleta de deposito con el número: { papeleta }  ya existe en: { banco }.'
-            )
-        
-        if 'cuenta_bancaria' in vals:
-            cuenta_bancaria = self.env['account.journal'].browse(vals['cuenta_bancaria'])
-            if cuenta_bancaria.bank_account_id:
-                vals['nombre_banco'] = cuenta_bancaria.bank_account_id.bank_id.name
-                 
-        vals['estado'] = 'S'
-        
-        fecha = datetime.strptime(vals['fecha'], '%Y-%m-%d')
-        
-        vals['fecha_char'] = fecha.strftime('%d/%m/%Y')
-            
+        if 'monto' in vals and int(vals['monto']) == 0:
+            raise ValidationError("El monto no puede estar vacío.")  
+                
+        for val in vals:
+            if(vals.get('papeleta_deposito') and
+                vals.get('cliente') and
+                vals.get('monto') and
+                vals.get('fecha') and
+                vals.get('proforma') and
+                vals.get('numero_cuenta') and
+                vals.get('doc_deposit') and
+                vals.get('nota')):
+                
+                vals['estado'] = 'S'
+         
         return super(Deposit, self).create(vals)
     
-    def write(self, vals):
-        if vals.get('fecha'):
-            fecha = datetime.strptime(vals['fecha'], '%Y-%m-%d')
-            vals['fecha_char'] = fecha.strftime('%d/%m/%Y')
+    def write(self, vals):           
+        for record in self:
+            if (
+                record.papeleta_deposito and
+                record.cliente and
+                record.monto and
+                record.fecha and
+                record.proforma and
+                record.numero_cuenta
+            ):
+                if (self.doc_deposit and 'nota' in vals) or ('doc_deposit' in vals and self.nota) or (self.doc_deposit and self.nota):
+                    vals['estado'] = 'S'
             
         return super(Deposit, self).write(vals)
     
@@ -134,7 +161,9 @@ class Deposit(models.Model):
     
     @api.model
     def load(self, fields, data):
+        fecha_actual = date.today()
         sheet = self.env.context.get('sheet', False)
+        
         account = sheet.strip()
         
         buscar_cuenta = self.search([('numero_cuenta', '=', account)])

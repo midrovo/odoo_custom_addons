@@ -4,46 +4,55 @@
             <field name="name">view.custom.deposit.form</field>
             <field name="model">custom.deposit</field>
             <field name="arch" type="xml">
-                <form string="Deposito">
+                <form string="Depósito">
                     <header>
                         <field name="estado" 
                                widget="statusbar"
                                statusbar_visible="B,S,C,F"/>
                     </header>
                     <sheet>
-                        <div class="oe_title" style="padding: 5px 0">
-                            <h2 class="o_row">
-                                Papeleta de Deposito: 
-                                <span attrs="{ 'invisible': [('estado','not in',[ 'B','S','C','F' ])] }">
-                                    <field name="papeleta_deposito" 
-                                           attrs="{ 'readonly': True }"/>
+                        <div class="oe_title" style="padding: 10px 0;">
+                            <h2 class="o_row" attrs="{ 'invisible': [('estado','not in',[ 'S','C','F' ])] }">
+                                Papeleta de Depósito:
+                                <span style="margin-left: 10px;">
+                                    <field name="papeleta_deposito" attrs="{ 'readonly': True }"/>
                                 </span>
                             </h2>
+                            <h2 class="o_row" attrs="{ 'invisible': [('estado','in',[ 'S','C','F' ])] }">Borrador</h2>
                         </div>
                         <group name="group_top">
                             <group name="group_left">
-                                <field name="papeleta_deposito"/>
-                                <field name="cliente" />
+                                <field name="papeleta_deposito"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
+                                <field name="cliente"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
                                 <label for="monto"/>
                                 <div class="o_row">
-                                    <field name="monto" />
+                                    <field name="monto"
+                                           attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
                                     <field name="moneda" options="{'no_create': True, 'no_open': True }" />
                                 </div>
-                                <field name="fecha" string="Fecha" />
-                            </group>
-                            <group name="group_right">
-                                <field name="proforma" />
-                                <field name="cuenta_bancaria" 
-                                       options="{'no_create': True, 'no_open': True }"/>
-                                <field name="numero_cuenta"
-                                       attrs="{ 'readonly': [('estado', 'in', ['B','S','C','F'])] }"/>
-                                <field name="doc_deposit"
-                                       widget="image"
-                                       options="{ 'size': [100, 100] }" />
-                                <field name="nota" />
+                                <field name="fecha" string="Fecha"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
+                                <field name="nota"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
                                 <field name="vendedor"
                                        attrs="{ 'invisible': [('estado', 'not in', ['S','C','F'])] }"
                                        options="{'no_create': True, 'no_open': True }" />
+                            </group>
+                            <group name="group_right">
+                                <field name="proforma"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
+                                <field name="cuenta_bancaria" 
+                                       options="{'no_create': True, 'no_open': True }"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
+                                <field name="nombre_banco" invisible="1"/>
+                                <field name="numero_cuenta"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
+                                <field name="doc_deposit"
+                                       widget="image"
+                                       options="{ 'size': [100, 100] }"
+                                       attrs="{ 'readonly': [('estado', 'in', ['C','F'])] }"/>
                             </group>
                         </group>
                     </sheet>
@@ -55,6 +64,9 @@
             <field name="name">view.custom.deposit.tree</field>
             <field name="model">custom.deposit</field>
             <field name="arch" type="xml">
+                <xpath expr="//menu[@name='Importar registros']" position="attributes">
+                    <attribute name="class">d-none</attribute>
+                </xpath>
                 <tree string="Depositos">
                     <field name="fecha_char" />
                     <field name="cliente" />
@@ -64,10 +76,21 @@
                     <field name="monto" />
                     <field name="estado"
                            widget="badge"
+                           decoration-muted="estado == 'B'"
                            decoration-info="estado == 'S'" 
                            decoration-success="estado == 'C'" 
-                           decoration-primary="estado == 'F'" />                    
+                           decoration-primary="estado == 'F'"/>                  
                 </tree>
+            </field>
+        </record>
+
+        <record id="view_custom_deposit_search" model="ir.ui.view">
+            <field name="name">custom.deposit.search</field>
+            <field name="model">custom.deposit</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Depósitos">
+                    <filter string="Estado: Subido" name="filter_subido" domain="[('estado', '=', 'S')]" groups="custom_deposit.group_custom_deposit_gestion"/>
+                </search>
             </field>
         </record>
 
