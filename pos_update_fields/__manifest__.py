@@ -17,7 +17,7 @@
 
     "assets": {
         "point_of_sale.assets": [
-            "pos_update_fields/static/src/xml/*.xml",
+            "pos_update_fields/static/src/xml/partner_details_edit.xml",
             # "pos_update_fields/static/src/js/*.js",
             # "pos_update_fields/static/src/scss/*.scss"
         ]
