@@ -4,7 +4,7 @@
     <t t-name="partner_details_edit" t-inherit="point_of_sale.PartnerDetailsEdit" t-inherit-mode="extension" owl="1">
         
         <xpath expr="//span[text()='Tax ID']" position="replace">
-            <span class="label">RUC/Cédula</span>
+            <span class="label">Cédula</span>
         </xpath>
 
     </t>
