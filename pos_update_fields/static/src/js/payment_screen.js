@@ -17,7 +17,7 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
 
     }
 
-    Registries.Component.add(PaymentScreenExtend, PaymentScreen);
+    Registries.Component.extend(PaymentScreen, PaymentScreenExtend);
 
     return PaymentScreen;
 });

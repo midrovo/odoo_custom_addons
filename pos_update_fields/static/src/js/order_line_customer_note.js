@@ -22,7 +22,8 @@ odoo.define('pos_update_fields.order_line_customer_note', function(require) {
         }
     }
 
-    Registries.Component.add(OrderlineCustomerNoteButtonExtend, OrderlineCustomerNoteButton);
+    // Registries.Component.add(OrderlineCustomerNoteButtonExtend, OrderlineCustomerNoteButton);
+    Registries.Component.extend(OrderlineCustomerNoteButton, OrderlineCustomerNoteButtonExtend);
 
     return OrderlineCustomerNoteButton;
 });
