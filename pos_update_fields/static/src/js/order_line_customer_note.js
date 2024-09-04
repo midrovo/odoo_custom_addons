@@ -3,6 +3,7 @@ odoo.define('pos_update_fields.order_line_customer_note', function(require) {
 
     const OrderlineCustomerNoteButton = require('point_of_sale.OrderlineCustomerNoteButton');
     const Registries = require('point_of_sale.Registries');
+    const NoteService = require('pos_update_fields.note_service')
 
     const OrderlineCustomerNoteButtonExtend = OrderlineCustomerNoteButton => class extends OrderlineCustomerNoteButton {
         setup() {
@@ -10,19 +11,17 @@ odoo.define('pos_update_fields.order_line_customer_note', function(require) {
         }
         async onClick() {
             const { confirmed, payload: inputNote } = await this.showPopup('TextAreaPopup', {
-                // startingValue: selectedOrderline.get_customer_note(),
                 title: this.env._t('Agregar Nota'),
             });
 
             if (confirmed) {
-                // selectedOrderline.set_customer_note(inputNote);
                 console.log(`OBTENIENDO INPUT NOTE >>> ${ inputNote }`)
-                this.trigger('note-update', { note: inputNote })
+                NoteService.setNote(inputNote);
+                
             }
         }
     }
 
-    // Registries.Component.add(OrderlineCustomerNoteButtonExtend, OrderlineCustomerNoteButton);
     Registries.Component.extend(OrderlineCustomerNoteButton, OrderlineCustomerNoteButtonExtend);
 
     return OrderlineCustomerNoteButton;
