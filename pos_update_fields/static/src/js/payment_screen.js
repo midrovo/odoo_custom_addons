@@ -3,7 +3,8 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
 
     const PaymentScreen = require('point_of_sale.PaymentScreen');
     const Registries = require('point_of_sale.Registries');
-    const NoteService = require('pos_update_fields.note_service')
+    const NoteService = require('pos_update_fields.note_service');
+    const rpc = require('web.rpc')
 
     const PaymentScreenExtend = PaymentScreen => class extends PaymentScreen {
         setup() {
@@ -11,13 +12,29 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
         }
 
         async validateOrder(isForceValidate) {
-            const orders = this.env.pos.selectedOrder
+            try {
+                const orders = this.env.pos.selectedOrder
+                const nota = NoteService.getNote()
 
-            console.log(orders)
+                const result = await rpc.query({
+                    model: "account.move",
+                    method: "get_note",
+                    args: [ nota ]
+                })
 
-            console.log(`MOSTRANDO NOTA DESDE PAYMENT >>> ${ NoteService.getNote() }`)
+                if(result) {
+                    console.log(result)
+                }
 
-            return await super.validateOrder(isForceValidate)
+                console.log(orders)
+
+                console.log(`MOSTRANDO NOTA DESDE PAYMENT >>> ${ NoteService.getNote() }`)
+
+                return await super.validateOrder(isForceValidate)
+                
+            } catch (error) {
+                console.log(error)
+            }
 
         }
 

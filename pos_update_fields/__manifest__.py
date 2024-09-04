@@ -9,7 +9,7 @@
     "website": "https://www.mgidev.com.ec",
     "category": "",
 
-    "depends": [ "point_of_sale", ],
+    "depends": [ "point_of_sale", "account" ],
 
     "licenses": "AGPL-3",
 
