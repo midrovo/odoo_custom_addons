@@ -11,6 +11,9 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
         }
 
         async validateOrder(isForceValidate) {
+            const orders = this.env.pos.selectedOrder
+
+            console.log(orders)
 
             console.log(`MOSTRANDO NOTA DESDE PAYMENT >>> ${ NoteService.getNote() }`)
 
