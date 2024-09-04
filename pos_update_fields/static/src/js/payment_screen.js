@@ -17,7 +17,7 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
                 const nota = NoteService.getNote()
 
                 const result = await rpc.query({
-                    model: "account.move",
+                    model: "pos.order",
                     method: "get_note",
                     args: [ nota ]
                 })
