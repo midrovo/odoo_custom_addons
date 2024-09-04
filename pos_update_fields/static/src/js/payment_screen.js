@@ -13,20 +13,18 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
 
         async validateOrder(isForceValidate) {
             try {
-                const orders = this.env.pos.selectedOrder
+                const orders = this.db.get_orders();
                 const nota = NoteService.getNote()
 
                 const result = await rpc.query({
                     model: "pos.order",
                     method: "get_note",
-                    args: [ nota ]
+                    args: [ nota, orders ]
                 })
 
                 if(result) {
                     console.log(result)
                 }
-
-                console.log(orders)
 
                 console.log(`MOSTRANDO NOTA DESDE PAYMENT >>> ${ NoteService.getNote() }`)
 
