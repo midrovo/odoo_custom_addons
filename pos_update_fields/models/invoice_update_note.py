@@ -9,7 +9,7 @@ class InvoiceUpdateNote(models.Model):
 
     @api.model
     def get_note(self, nota):
-        invoice = super(InvoiceUpdateNote, self)._generate_pos_order_invoice()
+        invoice = super(InvoiceUpdateNote, self).create_from_ui
 
         _logger.info(f'OBTENIENDO INVOICE >>> { invoice }')
         _logger.info(f'OBTENIENDO NOTA >>> { nota }')
