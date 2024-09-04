@@ -13,7 +13,7 @@ odoo.define('pos_update_fields.payment_screen', function (require) {
 
         async validateOrder(isForceValidate) {
             try {
-                const orders = this.db.get_orders();
+                const orders = this.env.pod.db.get_orders();
                 const nota = NoteService.getNote()
 
                 const result = await rpc.query({
